@@ -1,0 +1,872 @@
+1   ) #include <stdio.h>
+#include <string.h>
+
+struct Donor
+{
+int id;
+char name[30];
+int age;
+float weight;
+char bloodGroup[5];
+int days;
+};
+
+int checkEligibility(struct Donor d)
+{
+if (d.age >= 18 && d.age <= 65 &&
+d.weight >= 50 && d.days >= 90)
+return 1;
+else
+return 0;
+}
+
+void registerDonor(struct Donor *d)
+{
+printf("Enter Donor ID: ");
+scanf("%d", &d->id);
+
+printf("Enter Name: ");
+scanf("%29s", d->name);
+
+printf("Enter Age: ");
+scanf("%d", &d->age);
+
+printf("Enter Weight: ");
+scanf("%f", &d->weight);
+
+printf("Enter Blood Group: ");
+scanf("%4s", d->bloodGroup);
+
+printf("Days since last donation: ");
+scanf("%d", &d->days);
+}
+
+void findDonors(struct Donor d[], int n, char group[])
+{
+int i, found = 0;
+
+printf("\nEligible Donors:\n");
+
+for (i = 0; i < n; i++)
+{
+if (strcmp(d[i].bloodGroup, group) == 0 &&
+checkEligibility(d[i]))
+{
+printf("ID: %d Name: %s\n",
+d[i].id, d[i].name);
+found = 1;
+}
+}
+
+if (found == 0)
+printf("No eligible donors found.\n");
+}
+
+void updateStock(int *stock, int units)
+{
+*stock = *stock + units;
+printf("Stock updated successfully!\n");
+}
+
+void saveDonor(struct Donor d[], int n)
+{
+FILE *fp = fopen("donors.txt", "w");
+int i;
+
+if (fp == NULL)
+{
+printf("File cannot be opened.\n");
+return;
+}
+
+for (i = 0; i < n; i++)
+{
+fprintf(fp, "%d %s %d %.2f %s %d\n",
+d[i].id, d[i].name, d[i].age,
+d[i].weight, d[i].bloodGroup, d[i].days);
+}
+
+fclose(fp);
+printf("Donor details saved successfully!\n");
+}
+
+struct Result
+{
+int count;
+int youngestID;
+};
+
+struct Result getSummary(struct Donor d[], int n)
+{
+struct Result r;
+int i, youngestAge = 999;
+
+r.count = 0;
+r.youngestID = -1;
+
+for (i = 0; i < n; i++)
+{
+if (checkEligibility(d[i]))
+{
+r.count++;
+
+if (d[i].age < youngestAge)
+{
+youngestAge = d[i].age;
+r.youngestID = d[i].id;
+}
+}
+}
+
+return r;
+}
+
+int main()
+{
+struct Donor d[50];
+struct Result r;
+int n, i, stock = 0, units;
+char group[5];
+
+printf("===== BLOOD BANK MANAGEMENT =====\n");
+
+printf("Enter number of donors: ");
+scanf("%d", &n);
+
+if (n < 1 || n > 50)
+{
+printf("Invalid number of donors.\n");
+return 0;
+}
+
+for (i = 0; i < n; i++)
+{
+printf("\nEnter Donor %d Details\n", i + 1);
+registerDonor(&d[i]);
+}
+
+printf("\n===== ELIGIBILITY CHECK =====\n");
+
+for (i = 0; i < n; i++)
+{
+if (checkEligibility(d[i]))
+printf("%s is Eligible\n", d[i].name);
+else
+printf("%s is Not Eligible\n", d[i].name);
+}
+
+printf("\nEnter blood group to search: ");
+scanf("%4s", group);
+
+findDonors(d, n, group);
+
+printf("\nEnter donated blood units: ");
+scanf("%d", &units);
+
+if (units > 0)
+updateStock(&stock, units);
+else
+printf("Invalid units.\n");
+
+printf("Total blood stock: %d units\n", stock);
+
+r = getSummary(d, n);
+
+printf("\nTotal eligible donors: %d\n", r.count);
+
+if (r.youngestID != -1)
+printf("Youngest eligible donor ID: %d\n",
+r.youngestID);
+else
+printf("No eligible donors.\n");
+
+saveDonor(d, n);
+
+return 0;
+}
+
+
+
+
+
+
+
+OUTPUT
+===== BLOOD BANK MANAGEMENT =====
+Enter number of donors: 3
+
+Enter Donor 1 Details
+Enter Donor ID: 101
+Enter Name: arun
+Enter Age: 25
+Enter Weight: 60
+Enter Blood Group: o+
+Days since last donation: 100
+
+Enter Donor 2 Details
+Enter Donor ID: 102
+Enter Name: ravi
+Enter Age: 17
+Enter Weight: 55
+Enter Blood Group: o+
+Days since last donation: 120
+
+Enter Donor 3 Details
+Enter Donor ID: 103
+Enter Name: kumar
+Enter Age: 30
+Enter Weight: 65
+Enter Blood Group: a+
+Days since last donation: 150
+
+===== ELIGIBILITY CHECK =====
+arun is Eligible
+ravi is Not Eligible
+kumar is Eligible
+
+Enter blood group to search: o+
+
+Eligible Donors:
+ID: 101 Name: arun
+
+Enter donated blood units: 5
+Stock updated successfully!
+Total blood stock: 5 units
+
+Total eligible donors: 2
+Youngest eligible donor ID: 101
+File cannot be opened.
+
+
+
+2) #include <stdio.h>
+
+/* Function to calculate digital root */
+int digitalRoot(int n)
+{
+if (n < 10)
+return n;
+
+return digitalRoot(n % 10 + digitalRoot(n / 10));
+}
+
+/* Power using linear recursion */
+int powerLinear(int base, int n)
+{
+if (n == 0)
+return 1;
+
+return base * powerLinear(base, n - 1);
+}
+
+/* Power using halving recursion */
+int powerHalving(int base, int n)
+{
+int result;
+
+if (n == 0)
+return 1;
+
+result = powerHalving(base, n / 2);
+
+if (n % 2 == 0)
+return result * result;
+else
+return base * result * result;
+}
+
+int main()
+{
+int id, base, n;
+
+printf("===== BLOOD BANK RECURSION =====\n");
+
+printf("Enter Donor ID: ");
+scanf("%d", &id);
+
+printf("Enter base number: ");
+scanf("%d", &base);
+
+printf("Enter power: ");
+scanf("%d", &n);
+
+if (id < 0 || n < 0)
+{
+printf("Please enter non-negative values.\n");
+return 0;
+}
+
+printf("\nDigital Root = %d\n", digitalRoot(id));
+
+printf("Power using Linear Recursion = %d\n",
+powerLinear(base, n));
+
+printf("Power using Halving Recursion = %d\n",
+powerHalving(base, n));
+
+return 0;
+}
+
+
+
+OUTPUT )
+===== BLOOD BANK RECURSION =====
+Enter Donor ID: 12345
+Enter base number: 2
+Enter power: 4
+
+Digital Root = 6
+Power using Linear Recursion = 16
+Power using Halving Recursion = 16
+
+
+
+3) #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#define SIZE 8
+
+/* Find the blood group with the lowest stock */
+int *findLowestStock(int stock[])
+{
+int i;
+int *lowest = &stock[0];
+
+for (i = 1; i < SIZE; i++)
+{
+if (stock[i] < *lowest)
+{
+lowest = &stock[i];
+}
+}
+
+return lowest;
+}
+
+int main(int argc, char *argv[])
+{
+int stock[SIZE] = {10, 20, 5, 15, 8, 12, 25, 6};
+
+char *groups[SIZE] =
+{
+"A+", "A-", "B+", "B-",
+"AB+", "AB-", "O+", "O-"
+};
+
+int i;
+int *p = stock;
+
+/* Pointer operations */
+printf("===== POINTER OPERATIONS =====\n");
+
+printf("p + 3 = %p\n", (void *)(p + 3));
+printf("*(p + 3) = %d\n", *(p + 3));
+printf("p[3] = %d\n", p[3]);
+
+printf("*p++ = %d\n", *p++);
+printf("New first pointer value = %d\n", *p);
+
+/* Command line interface */
+if (argc == 3 && strcmp(argv[1], "find") == 0)
+{
+for (i = 0; i < SIZE; i++)
+{
+if (strcmp(argv[2], groups[i]) == 0)
+{
+printf("\n%s stock = %d units\n",
+groups[i], stock[i]);
+return 0;
+}
+}
+
+printf("Invalid blood group!\n");
+return 1;
+}
+
+else if (argc == 4 && strcmp(argv[1], "issue") == 0)
+{
+int units = atoi(argv[3]);
+
+for (i = 0; i < SIZE; i++)
+{
+if (strcmp(argv[2], groups[i]) == 0)
+{
+if (units <= 0 || units > stock[i])
+{
+printf("Invalid units or insufficient stock!\n");
+return 1;
+}
+
+stock[i] = stock[i] - units;
+
+printf("\nBlood issued successfully!\n");
+printf("Blood group: %s\n", groups[i]);
+printf("Remaining stock: %d units\n", stock[i]);
+
+return 0;
+}
+}
+
+printf("Invalid blood group!\n");
+return 1;
+}
+
+else if (argc == 2 && strcmp(argv[1], "lowest") == 0)
+{
+int *lowest = findLowestStock(stock);
+
+printf("\nLowest blood stock = %d units\n", *lowest);
+
+*lowest = *lowest + 5;
+
+printf("Updated lowest stock = %d units\n", *lowest);
+
+return 0;
+}
+
+else
+{
+printf("\nInvalid command!\n");
+printf("Usage:\n");
+printf("bloodbank find O+\n");
+printf("bloodbank issue A- 2\n");
+printf("bloodbank lowest\n");
+
+return 1;
+}
+}
+
+
+
+OUTPUT ) 
+
+
+  POINTER OPERATIONS =====
+p + 3 = 0x7fffa4c207bc
+*(p + 3) = 15
+p[3] = 15
+*p++ = 10
+New first pointer value = 20
+
+Invalid command!
+Usage:
+bloodbank find O+
+bloodbank issue A- 2
+bloodbank lowest
+
+
+=== Code Exited With Errors ==
+
+
+4) #include <stdio.h>
+#include <stdlib.h>
+
+struct Donor {
+int id;
+char name[50];
+char bloodGroup[5];
+};
+
+int main() {
+struct Donor *donors;
+struct Donor *temp;
+int count = 0, capacity = 2;
+char choice;
+
+// Allocate initial memory
+donors = malloc(capacity * sizeof(struct Donor));
+
+if (donors == NULL) {
+printf("Memory allocation failed!\n");
+return 1;
+}
+
+do {
+// Check whether array is full
+if (count == capacity) {
+int newCapacity = capacity * 2;
+
+temp = realloc(donors,
+newCapacity * sizeof(struct Donor));
+
+if (temp == NULL) {
+printf("Memory reallocation failed!\n");
+printf("Cannot add more donors.\n");
+break;
+}
+
+donors = temp;
+capacity = newCapacity;
+
+printf("\nMemory increased to %d donors.\n",
+capacity);
+}
+
+// Get donor details
+printf("\nEnter Donor ID: ");
+scanf("%d", &donors[count].id);
+
+printf("Enter Donor Name: ");
+scanf("%49s", donors[count].name);
+
+printf("Enter Blood Group: ");
+scanf("%4s", donors[count].bloodGroup);
+
+count++;
+
+printf("\nDo you want to add another donor? (y/n): ");
+scanf(" %c", &choice);
+
+} while (choice == 'y' || choice == 'Y');
+
+// Display donor details
+printf("\n----- DONOR LIST -----\n");
+
+for (int i = 0; i < count; i++) {
+printf("\nDonor ID: %d", donors[i].id);
+printf("\nName: %s", donors[i].name);
+printf("\nBlood Group: %s\n",
+donors[i].bloodGroup);
+}
+
+printf("\nTotal Donors: %d\n", count);
+printf("Allocated Capacity: %d\n", capacity);
+
+// Release allocated memory
+free(donors);
+donors = NULL;
+
+printf("\nMemory released successfully.\n");
+
+return 0;
+}
+
+
+
+OUTPUT )
+Enter Donor ID: 101
+Enter Donor Name: ARUN
+Enter Blood Group: A+
+
+Do you want to add another donor? (y/n):
+
+=== Session Ended Due To Inactivity ===
+
+
+5) 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+/* Donor details */
+struct Donor {
+int id;
+char name[30];
+char group[4];
+};
+
+/* Blood stock details */
+struct Stock {
+int group_code;
+int units;
+};
+
+long long calls = 0;
+
+/* Recursive digital root */
+int digital_root(int n) {
+if (n < 10)
+return n;
+
+int sum = 0;
+
+while (n > 0) {
+sum += n % 10;
+n = n / 10;
+}
+
+return digital_root(sum);
+}
+
+/* Linear recursive power */
+long long power_linear(long long base, int exp) {
+calls++;
+
+if (exp == 0)
+return 1;
+
+return base * power_linear(base, exp - 1);
+}
+
+/* Fast recursive power */
+long long power_fast(long long base, int exp) {
+calls++;
+
+if (exp == 0)
+return 1;
+
+long long half = power_fast(base, exp / 2);
+
+if (exp % 2 == 0)
+return half * half;
+
+return base * half * half;
+}
+
+/* Add donor using dynamic memory */
+void add_donor(struct Donor **list, int *size, int *capacity) {
+struct Donor *temp;
+
+if (*size == *capacity) {
+int newCapacity = (*capacity == 0) ? 2 : (*capacity * 2);
+
+temp = realloc(*list, newCapacity * sizeof(struct Donor));
+
+if (temp == NULL) {
+printf("Memory allocation failed!\n");
+return;
+}
+
+*list = temp;
+*capacity = newCapacity;
+printf("Memory increased to %d donors.\n", *capacity);
+}
+
+printf("Enter donor ID: ");
+scanf("%d", &(*list)[*size].id);
+
+printf("Enter donor name: ");
+scanf("%29s", (*list)[*size].name);
+
+printf("Enter blood group: ");
+scanf("%3s", (*list)[*size].group);
+
+FILE *fp = fopen("donors.txt", "a");
+
+if (fp == NULL) {
+perror("File error");
+return;
+}
+
+fprintf(fp, "%d %s %s\n",
+(*list)[*size].id,
+(*list)[*size].name,
+(*list)[*size].group);
+
+fclose(fp);
+
+(*size)++;
+
+printf("Donor added successfully!\n");
+}
+
+/* Display donor text file */
+void display_donors() {
+FILE *fp = fopen("donors.txt", "r");
+
+if (fp == NULL) {
+perror("Donor file");
+return;
+}
+
+int id;
+char name[30], group[4];
+
+printf("\n--- DONOR DETAILS ---\n");
+
+while (fscanf(fp, "%d %29s %3s",
+&id, name, group) == 3) {
+printf("ID: %d Name: %s Group: %s\n",
+id, name, group);
+}
+
+fclose(fp);
+}
+
+/* Binary stock file and update using fseek */
+void stock_update() {
+FILE *fp = fopen("stock.dat", "wb");
+
+if (fp == NULL) {
+perror("Stock file");
+return;
+}
+
+struct Stock stock[5] = {
+{1, 40}, {2, 25}, {3, 12}, {4, 8}, {5, 30}
+};
+
+fwrite(stock, sizeof(struct Stock), 5, fp);
+fclose(fp);
+
+int index, units;
+
+printf("Enter record number to update (1-5): ");
+scanf("%d", &index);
+
+printf("Enter new units: ");
+scanf("%d", &units);
+
+fp = fopen("stock.dat", "rb+");
+
+if (fp == NULL) {
+perror("Stock file");
+return;
+}
+
+struct Stock s;
+
+if (index < 1 || index > 5) {
+printf("Invalid record number!\n");
+fclose(fp);
+return;
+}
+
+if (fseek(fp, (index - 1) * sizeof(struct Stock),
+SEEK_SET) != 0 ||
+fread(&s, sizeof(struct Stock), 1, fp) != 1) {
+printf("Record reading failed!\n");
+fclose(fp);
+return;
+}
+
+s.units = units;
+
+if (fseek(fp, -(long)sizeof(struct Stock), SEEK_CUR) != 0 ||
+fwrite(&s, sizeof(struct Stock), 1, fp) != 1) {
+printf("Record updating failed!\n");
+fclose(fp);
+return;
+}
+
+printf("Stock updated successfully!\n");
+
+rewind(fp);
+
+printf("\n--- BLOOD STOCK ---\n");
+
+while (fread(&s, sizeof(struct Stock), 1, fp) == 1) {
+printf("Group code: %d Units: %d\n",
+s.group_code, s.units);
+}
+
+fclose(fp);
+}
+
+/* Main function */
+int main() {
+struct Donor *list = NULL;
+int size = 0, capacity = 0;
+int choice, n, base, exp;
+
+do {
+printf("\n===== BLOOD BANK MANAGEMENT =====\n");
+printf("1. Add Donor\n");
+printf("2. Display Donors\n");
+printf("3. Update Blood Stock\n");
+printf("4. Recursive Functions\n");
+printf("5. Exit\n");
+
+printf("Enter your choice: ");
+scanf("%d", &choice);
+
+switch (choice) {
+
+case 1:
+add_donor(&list, &size, &capacity);
+break;
+
+case 2:
+display_donors();
+break;
+
+case 3:
+stock_update();
+break;
+
+case 4:
+printf("Enter a number for digital root: ");
+scanf("%d", &n);
+
+if (n >= 0)
+printf("Digital root = %d\n",
+digital_root(n));
+else
+printf("Enter a positive number.\n");
+
+printf("\nEnter base: ");
+scanf("%d", &base);
+
+printf("Enter exponent: ");
+scanf("%d", &exp);
+
+if (exp < 0) {
+printf("Exponent must be non-negative.\n");
+break;
+}
+
+calls = 0;
+printf("Linear power = %lld\n",
+power_linear(base, exp));
+printf("Linear calls = %lld\n", calls);
+
+calls = 0;
+printf("Fast power = %lld\n",
+power_fast(base, exp));
+printf("Fast calls = %lld\n", calls);
+break;
+
+case 5:
+printf("Exiting program...\n");
+break;
+
+default:
+printf("Invalid choice!\n");
+}
+
+} while (choice != 5);
+
+free(list);
+list = NULL;
+
+printf("Memory released successfully.\n");
+
+return 0;
+}
+
+
+
+OUTPUT
+--- DONOR DETAILS ---
+ID: 101 Name: Arun Group: O+
+ID: 102 Name: Ravi Group: A+
+
+Enter your choice: 3
+Enter record number to update (1-5): 3
+Enter new units: 20
+
+Stock updated successfully!
+
+--- BLOOD STOCK ---
+Group code: 1 Units: 40
+Group code: 2 Units: 25
+Group code: 3 Units: 20
+Group code: 4 Units: 8
+Group code: 5 Units: 30
+
+Enter your choice: 4
+Enter a number for digital root: 9875
+Digital root = 2
+
+Enter base: 2
+Enter exponent: 10
+
+Linear power = 1024
+Linear calls = 11
+Fast power = 1024
+Fast calls = 5
+
+Enter your choice: 5
+Exiting program...
+Memory released successfully.
